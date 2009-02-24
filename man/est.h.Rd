@@ -78,10 +78,10 @@ See Buerkle (2005) for additional details.
 \references{
 Buerkle C. A. (2005) Maximum-likelihood estimation of a hybrid index
 based on molecular markers. \emph{Molecular Ecology Notes}, \bold{5}, 684-687.  
-  
+
 Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
-hybrids. \emph{Molecular Ecology}, \emph{in press}.
+hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
 Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular

@@ -48,11 +48,11 @@ A matrix with log likelihood ratios for each marker (row).
 \references{
 Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
-hybrids. \emph{Molecular Ecology}, \emph{in press}.
+hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
-Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
+  Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular
-  Ecology Resources}, \emph{in preparation}.  
+Ecology Resources}, \emph{in preparation}.
 
  } 
 

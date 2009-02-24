@@ -74,29 +74,41 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     ## are used for making cline plots.
     for (i in 1:n.loci){
       cat("estimating genomic cline for:",as.character(loci.data[i,1]),"\n")
-      reg.out<-multinom(count.matrix[i,]~hi.index, trace=FALSE)
-      ## for dominant data
-      if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" | loci.data[i,2]=="h"){
-        if (length(coef(reg.out))<2) warning("warning, invariant locus included")
+      local.cnt<-count.matrix[i,]
+      local.cnt<-local.cnt[!is.na(local.cnt)]
+      if (length(unique(local.cnt))==1){
+        warning ("warning, invariant locus included: ", as.character(loci.data[i,1]))
+        clines.out<-fit.invariant.clines(count.matrix[i,],n.ind,loci.data[i,2])
+        if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          Aa.real.fitted.array[i,]<-clines.out[2,]
+          aa.real.fitted.array[i,]<-clines.out[3,]
+        }
         else{
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          aa.real.fitted.array[i,]<-clines.out[2,]
+        }
+      }
+      else{
+        reg.out<-multinom(count.matrix[i,]~hi.index, trace=FALSE)
+        ## for dominant data
+        if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" | loci.data[i,2]=="h"){
           AA.slope[i]<-coef(reg.out)[2]
           AA.int[i]<-coef(reg.out)[1]
           Hx<-exp(AA.int[i]+AA.slope[i]*hi.index)
           AA.real.fitted.array[i,]<-exp(AA.int[i]+AA.slope[i]*hi.index)/(1+Hx)
-          aa.real.fitted.array[i,]<-1-AA.real.fitted.array[i,]
-        }	
-      }
-      ## for co-dominant data
-      ## this now uses the fit.c.clines function
-      else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-        if (length(coef(reg.out))<2) warning("warning, invariant locus included")
-        clines.out<-fit.c.clines(reg.out,hi.index,count.matrix[i,],n.ind)
-        AA.real.fitted.array[i,]<-clines.out[1,]
-        Aa.real.fitted.array[i,]<-clines.out[2,]
-        aa.real.fitted.array[i,]<-clines.out[3,]
+          aa.real.fitted.array[i,]<-1-AA.real.fitted.array[i,]	
+        }
+        ## for co-dominant data
+        ## this now uses the fit.c.clines function
+        else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+          clines.out<-fit.c.clines(reg.out,hi.index,count.matrix[i,],n.ind)
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          Aa.real.fitted.array[i,]<-clines.out[2,]
+          aa.real.fitted.array[i,]<-clines.out[3,]
+        }
       }
     }
-    
     rownames(AA.real.fitted.array)<-loci.data[,1]
     rownames(Aa.real.fitted.array)<-loci.data[,1]
     rownames(aa.real.fitted.array)<-loci.data[,1]
@@ -293,38 +305,41 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       Aa.fitted.all<-array(dim=c(n.reps,n.ind))
       aa.fitted.all<-array(dim=c(n.reps,n.ind))
       for (k in 1:n.reps){
-        reg.out<-multinom(sam.neutral[i,,k]~hi.index, trace=FALSE)
-        ## for dominant or haploid markers data
-        if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
-            loci.data[i,2]=="h"){
-          if (length(coef(reg.out))<2){
-            if(sum(sam.neutral[i,,k]==1,na.rm=TRUE)>=1){
-              AA.fitted.all[k,]<-rep(1,n.ind)
-              aa.fitted.all[k,]<-rep(0,n.ind)
-            }
-            else{
-              AA.fitted.all[k,]<-rep(0,n.ind)
-              aa.fitted.all[k,]<-rep(1,n.ind)
-            } 
+        local.cnt<-sam.neutral[i,,k]
+        local.cnt<-local.cnt[!is.na(local.cnt)]
+        if(length(unique(local.cnt))==1){
+          clines.out<-fit.invariant.clines(sam.neutral[i,,k],n.ind,loci.data[i,2])
+          if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+            AA.fitted.all[k,]<-clines.out[1,]
+            Aa.fitted.all[k,]<-clines.out[2,]
+            aa.fitted.all[k,]<-clines.out[3,]
           }
           else{
+            AA.fitted.all[k,]<-clines.out[1,]
+            aa.fitted.all[k,]<-clines.out[2,]
+          }
+        }
+        else {
+          reg.out<-multinom(sam.neutral[i,,k]~hi.index, trace=FALSE)
+          ## for dominant or haploid markers data
+          if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
+              loci.data[i,2]=="h"){
             AA.slope.neutral<-coef(reg.out)[2]
             AA.int.neutral<-coef(reg.out)[1]
             Hx<-exp(AA.int.neutral+AA.slope.neutral*hi.index)
             AA.fitted.all[k,]<-exp(AA.int.neutral+AA.slope.neutral*hi.index)/(1+Hx)
             aa.fitted.all[k,]<-1-AA.fitted.all[k,]
           }	
+          ## for co-dominant data
+          ## this now uses the fit.c.clines function
+          else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+            clines.out<-fit.c.clines(reg.out,hi.index,sam.neutral[i,,k],n.ind)
+            AA.fitted.all[k,]<-clines.out[1,]
+            Aa.fitted.all[k,]<-clines.out[2,]
+            aa.fitted.all[k,]<-clines.out[3,]
+          }
         }
-        ## for co-dominant data
-        ## this now uses the fit.c.clines function
-        else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-	  clines.out<-fit.c.clines(reg.out,hi.index,sam.neutral[i,,k],n.ind)
-	  AA.fitted.all[k,]<-clines.out[1,]
-	  Aa.fitted.all[k,]<-clines.out[2,]
-	  aa.fitted.all[k,]<-clines.out[3,]
-        }
-      }
-      
+      }#temp
       ## sum results from each rep
       if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data [i,2]=="H" |
           loci.data [i,2]=="h"){
@@ -352,37 +367,39 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ln.likelihood.ratio10<-numeric(n.reps)
       ## perform regressions			
       for (k in 1:n.reps){
-        reg.out<-multinom(sam.gen[i,,k]~hi.index, trace=FALSE)
-        ## for dominant or haploid marker data
-        if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
-            loci.data[i,2]=="h"){
-          if (length(coef(reg.out))<2){
-            if(sum(sam.gen[i,,k]==1,na.rm=TRUE)>=1){
-              AA.fitted.array[i,,k]<-rep(1,n.ind)
-              aa.fitted.array[i,,k]<-rep(0,n.ind)
-            }
-            else{
-              AA.fitted.array[i,,k]<-rep(0,n.ind)
-              aa.fitted.array[i,,k]<-rep(1,n.ind)
-            } 
+        local.cnt<-sam.gen[i,,k]
+        local.cnt<-local.cnt[!is.na(local.cnt)]
+        if(length(unique(local.cnt))==1){
+          clines.out<-fit.invariant.clines(sam.gen[i,,k],n.ind,loci.data[i,2])
+          if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+            AA.fitted.array[i,,k]<-clines.out[1,]
+            Aa.fitted.array[i,,k]<-clines.out[2,]
+            aa.fitted.array[i,,k]<-clines.out[3,]
           }
           else{
+            AA.fitted.array[i,,k]<-clines.out[1,]
+            aa.fitted.array[i,,k]<-clines.out[2,]
+          }
+        }
+        else{
+          reg.out<-multinom(sam.gen[i,,k]~hi.index, trace=FALSE)
+          ## for dominant or haploid marker data
+          if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" | loci.data[i,2]=="h"){
             AA.slope.neutral<-coef(reg.out)[2]
             AA.int.neutral<-coef(reg.out)[1]
             Hx<-exp(AA.int.neutral+AA.slope.neutral*hi.index)
             AA.fitted.array[i,,k]<-exp(AA.int.neutral+AA.slope.neutral*hi.index)/(1+Hx)
             aa.fitted.array[i,,k]<-1-AA.fitted.array[i,,k]
-          }	
+          }
+          ## for co-dominant data
+          ## this now uses the fit.c.clines function
+          else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+            clines.out<-fit.c.clines(reg.out,hi.index,sam.gen[i,,k],n.ind)
+            AA.fitted.array[i,,k]<-clines.out[1,]
+            Aa.fitted.array[i,,k]<-clines.out[2,]
+            aa.fitted.array[i,,k]<-clines.out[3,]
+          }
         }
-        ## for co-dominant data
-        ## this now uses the fit.c.clines function
-        else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-          clines.out<-fit.c.clines(reg.out,hi.index,sam.gen[i,,k],n.ind)
-          AA.fitted.array[i,,k]<-clines.out[1,]
-          Aa.fitted.array[i,,k]<-clines.out[2,]
-          aa.fitted.array[i,,k]<-clines.out[3,]
-        }
-        
         ## calculates probability of models
         ## for dominant or haploid marker data
         if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
@@ -453,26 +470,40 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       rownames(AA.neutral.lb)<-loci.data[,1]
       rownames(Aa.neutral.lb)<-loci.data[,1]
       rownames(aa.neutral.lb)<-loci.data[,1]
-      ## multinomial regression on observed data
-      reg.out<-multinom(count.matrix[i,]~hi.index, trace=FALSE)
-      ## for dominant or haploid marker data
-      if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
-          loci.data[i,2]=="h"){
-        if (length(coef(reg.out))<2) warning("warning, invariant locus included")
+      local.cnt<-count.matrix[i,]
+      local.cnt<-local.cnt[!is.na(local.cnt)]
+      if(length(unique(local.cnt))==1){
+        warning ("warning, invariant locus included: ", as.character(loci.data[i,1]))
+        clines.out<-fit.invariant.clines(count.matrix[i,],n.ind,loci.data[i,2])
+        if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          Aa.real.fitted.array[i,]<-clines.out[2,]
+          aa.real.fitted.array[i,]<-clines.out[3,]
+        }
         else{
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          aa.real.fitted.array[i,]<-clines.out[2,]
+        }
+      }
+      else{
+        ## multinomial regression on observed data
+        reg.out<-multinom(count.matrix[i,]~hi.index, trace=FALSE)
+        ## for dominant or haploid marker data
+        if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
+            loci.data[i,2]=="h"){
           AA.slope[i]<-coef(reg.out)[2]
           AA.int[i]<-coef(reg.out)[1]
           Hx<-exp(AA.int[i]+AA.slope[i]*hi.index)
           AA.real.fitted.array[i,]<-exp(AA.int[i]+AA.slope[i]*hi.index)/(1+Hx)
           aa.real.fitted.array[i,]<-1-AA.real.fitted.array[i,]
         }	
-      }
-      ## for co-dominant data
-      else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-        clines.out<-fit.c.clines(reg.out,hi.index,count.matrix[i,],n.ind)
-        AA.real.fitted.array[i,]<-clines.out[1,]
-        Aa.real.fitted.array[i,]<-clines.out[2,]
-        aa.real.fitted.array[i,]<-clines.out[3,]
+        ## for co-dominant data
+        else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+          clines.out<-fit.c.clines(reg.out,hi.index,count.matrix[i,],n.ind)
+          AA.real.fitted.array[i,]<-clines.out[1,]
+          Aa.real.fitted.array[i,]<-clines.out[2,]
+          aa.real.fitted.array[i,]<-clines.out[3,]
+        }
       }
       ## calculate probabilities
       prob.obs.model1<-(rep(NA,n.ind))
@@ -516,8 +547,9 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ## calculate and save p.value and ln.lik ratio	
       p.value[i]<-(sum(ln.likelihood.ratio10>=ln.likelihood.ratio10.real))/n.reps
       lnlik.ratios[i]<-ln.likelihood.ratio10.real
-      ##the bracket below closes the locus loop		
+      ##the bracket below closes the locus loop
     }
+    
     ## make list for output: clines.out is a list, the first element
     ## gives the locus names, the next three elements are the fitted
     ## values for AA, Aa, and aa; the next three elements are the
@@ -537,7 +569,6 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       colnames(Aa.real.fitted.array)<-individual.data[,2]
       colnames(aa.real.fitted.array)<-individual.data[,2]
     }
-
     summary.data<-cbind(loci.data[,1],loci.data[,2],lnlik.ratios,p.value)
     colnames(summary.data)<-c("locus","type","lnL ratio","P-value")
     clines.out<-list(summary.data, AA.real.fitted.array, Aa.real.fitted.array,

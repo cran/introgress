@@ -1,7 +1,7 @@
 Package: introgress
 Type: Package
 Title: introgress
-Version: 1.0
+Version: 1.1
 Date: 2009-02-24
 Author: Zachariah Gompert, C. Alex Buerkle
 Maintainer: C. Alex Buerkle <buerkle@uwyo.edu>
@@ -10,4 +10,4 @@ Description: introgress provides functions for analyzing introgression of genoty
 License: GPL (>= 2)
 URL: http://www.uwyo.edu/buerkle/
 LazyLoad: yes
-Packaged: Wed Feb 25 09:38:11 2009; zgompert
+Packaged: Fri Mar  6 14:09:15 2009; zgompert

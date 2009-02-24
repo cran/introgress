@@ -77,6 +77,10 @@ neutral distribution for significance testing. The permutation method
 cannot be used if both co-dominant and dominant (or haploid) data are
 included in the analysis.
 
+The function will issue a warning if an invariant locus is included (all
+individuals have the same genotype).  In this case the probability of
+one of the genotypes does not vary with hybrid index.
+
 See Gompert and Buerkle (2009a, 2009b) for additional details.
 }
 
@@ -125,7 +129,7 @@ A list with the following components:
 \references{
 Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
-hybrids. \emph{Molecular Ecology}, \emph{in press}.
+hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
 Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular

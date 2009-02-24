@@ -42,35 +42,6 @@ function(reg.out=NULL, hi.index=NULL, sam=NULL, n.ind=NULL){
       aa.fitted<-1-exp(Aa.slope*hi.index+Aa.int)/(1+Hx)
     }
   }
-  else if (length(coef(reg.out))<2){
-    if(sum(sam==2,na.rm=TRUE)>=1){
-      AA.slope<-NA
-      AA.int<-NA
-      Aa.slope<-NA
-      Aa.int<-NA
-      AA.fitted<-rep(1,n.ind)
-      Aa.fitted<-rep(0,n.ind)
-      aa.fitted<-rep(0,n.ind)
-    }
-    else if(sum(sam==1,na.rm=TRUE)>=1){
-      AA.slope<-NA
-      AA.int<-NA
-      Aa.slope<-NA
-      Aa.int<-NA
-      AA.fitted<-rep(0,n.ind)
-      Aa.fitted<-rep(1,n.ind)
-      aa.fitted<-rep(0,n.ind)
-    }
-    else if(sum(sam==0,na.rm=TRUE)>=1){
-      AA.slope<-NA
-      AA.int<-NA
-      Aa.slope<-NA
-      Aa.int<-NA
-      AA.fitted<-rep(0,n.ind)
-      Aa.fitted<-rep(0,n.ind)
-      aa.fitted<-rep(1,n.ind)
-    }
-  }
   fitted.mat<-rbind(AA.fitted,Aa.fitted,aa.fitted)
   return(fitted.mat)					
 }

@@ -8,7 +8,7 @@ output from the function \code{genomic.clines}.
 }
 \usage{
 clines.plot(cline.data=NULL,marker.order=NULL,rplots=3,cplots=3,pdf=TRUE,
-            out.file="clines.pdf")
+            out.file="clines.pdf",colors=c("#005A32","#41AB5D"))
 }
 \arguments{
   
@@ -31,6 +31,8 @@ clines.plot(cline.data=NULL,marker.order=NULL,rplots=3,cplots=3,pdf=TRUE,
   
   \item{out.file}{a character string for the filename for the
     output if \code{pdf=TRUE}.}
+
+  \item{colors}{a vector of two colors to be used for cline plots.}
 }  
 
 \details{
@@ -63,12 +65,11 @@ A plot is produced, but a data object is not returned.
 \references{
 Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
-hybrids. \emph{Molecular Ecology}, \emph{in press}.
+hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
 Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular
   Ecology Resources}, \emph{in preparation}.  
-
  } 
 
 \author{

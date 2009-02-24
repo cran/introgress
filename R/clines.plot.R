@@ -1,10 +1,11 @@
 `clines.plot` <-
 function(cline.data=NULL, marker.order=NULL, rplots=3, cplots=3,
-                      pdf=TRUE, out.file="clines.pdf"){
+                      pdf=TRUE, out.file="clines.pdf",colors=c("#005A32","#41AB5D")){
   if (is.null(cline.data)==TRUE)
     stop("error, input file was not provided")
   if (is.list(cline.data)==FALSE)
     stop("error, cline.data input file not in list format")
+  if (length(colors)!=2) stop ("colors must be a vector of length two.")
   ##set up output file
   if (pdf==TRUE) pdf(file=paste(out.file))
   par(mfrow=c(rplots,cplots))
@@ -45,10 +46,10 @@ function(cline.data=NULL, marker.order=NULL, rplots=3, cplots=3,
                                        cline.data[[3]][i,])[,order(-hi.index)]
         polygon(c(polygon.data.matrix[1,],polygon.data.matrix.rev[1,]),
                 c(polygon.data.matrix[2,],polygon.data.matrix.rev[3,]),
-                col="#005A32", border=NA)
+                col=colors[1], border=NA)
         polygon(c(polygon.data.matrix[1,],polygon.data.matrix.rev[1,]),
                 c(polygon.data.matrix[4,],polygon.data.matrix.rev[5,]),
-                col="#41AB5D",border=NA)
+                col=colors[2],border=NA)
         lines(polygon.data.matrix[1,],polygon.data.matrix[6,],lty=1)
         lines(polygon.data.matrix[1,],polygon.data.matrix[7,],lty=2)
       }
@@ -80,7 +81,7 @@ function(cline.data=NULL, marker.order=NULL, rplots=3, cplots=3,
                                        cline.data[[5]][[1]][i,],cline.data[[2]][i,])[,order(-hi.index)]
         polygon(c(polygon.data.matrix[1,],polygon.data.matrix.rev[1,]),
                 c(polygon.data.matrix[2,],polygon.data.matrix.rev[3,]),
-                col="#41AB5D", border=NA)
+                col=colors[2], border=NA)
         lines(polygon.data.matrix[1,],polygon.data.matrix[4,],lty=1)
       }
       else {

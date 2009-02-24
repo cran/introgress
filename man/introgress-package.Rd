@@ -46,9 +46,9 @@ For further information regarding the above functions and additional
 
 
 \references{
-Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
+  Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
-hybrids. \emph{Molecular Ecology}, \emph{in press}.
+hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
 Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular
