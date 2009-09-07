@@ -1,7 +1,7 @@
 Package: introgress
 Type: Package
 Title: methods for analyzing introgression between divergent lineages
-Version: 1.2
+Version: 1.2.1
 Date: 2009-09-07
 Author: Zachariah Gompert, C. Alex Buerkle
 Maintainer: C. Alex Buerkle <buerkle@uwyo.edu>
@@ -15,6 +15,6 @@ Description: introgress provides functions for analyzing introgression
 License: GPL (>= 2)
 URL: http://www.uwyo.edu/buerkle/software/introgress/
 LazyLoad: yes
-Packaged: 2009-09-07 20:08:53 UTC; zgompert
+Packaged: 2009-10-19 21:01:00 UTC; zgompert
 Repository: CRAN
-Date/Publication: 2009-09-07 22:27:27
+Date/Publication: 2009-10-20 06:56:44

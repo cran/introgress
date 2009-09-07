@@ -261,8 +261,13 @@ function(admix.gen=NULL,loci.data=NULL,
       ## it is important to get the loci names from the parental files for the right loci to be referenced
       a.n <- allele.names(as.genotype(c(parental1[i,],parental2[i,]), allow.partial.missing=TRUE))
       names[i,1:length(a.n)] <- a.n
+      ## 16 Oct 09 -- changed the alleles to count to be those from
+      ## combo2, which are at high frequency in spa (Parental 1, with
+      ## low hybrid index)
       ind.counts<-allele.count(as.genotype(admix.gen[i,],allow.partial.missing=TRUE),
-                               names[i,as.numeric(combos.touse[i,3:(3+maxalleles-1)])], na.rm=TRUE)
+                               names[i,as.numeric(combos.touse[i,(3+maxalleles):(3+2*maxalleles-1)])],
+                               na.rm=TRUE)
+
       ind.counts[is.na(admix.gen[i,])]<-NA
       count.matrix[i,]<-ind.counts      
     }
@@ -270,11 +275,7 @@ function(admix.gen=NULL,loci.data=NULL,
     if (is.null(individual.data)==FALSE){
       if (is.na(individual.data[1,2])==FALSE) colnames(count.matrix)<-as.character(individual.data[,2])
     }
-    ## this makes the species 2 allele homozyogote 0
-    for (i in 1:n.loci){
-      if (ploidy[i]==2) count.matrix[i,]<-abs(count.matrix[i,]-2)
-      else if (ploidy[i]==1) count.matrix[i,]<-abs(count.matrix[i,]-1)
-    }
+
     introgress.data<-list(Individual.data=individual.data, Count.matrix=count.matrix,
                           Combos.to.use=combos.touse, Parental1.allele.freq=p1.freq.all,
                           Parental2.allele.freq=p2.freq.all, Alleles=names, Admix.gen=admix.gen)

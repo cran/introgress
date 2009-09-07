@@ -145,15 +145,19 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     Aa.slope<-numeric(n.loci)
     AA.int<-numeric(n.loci)
     Aa.int<-numeric(n.loci)
+    
     AA.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
     Aa.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
     aa.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
+    
     AA.real.fitted.array<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     Aa.real.fitted.array<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     aa.real.fitted.array<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
+    
     AA.neutral.ub<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     Aa.neutral.ub<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     aa.neutral.ub<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
+
     AA.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     Aa.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     aa.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
@@ -185,15 +189,25 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       sam.neutral<-array(dim=c(n.loci,n.ind,n.reps))
       sam.gen<-array(dim=c(n.loci,n.ind,n.reps))
       
-      ## tests for combos.touse, if it is still NULL fixed differences
-      ## are assumed with spb having a frequency of 1
+
+      ## E.A is the prob of sampling an allele from allelic class 2,
+      ## which is at higher frequency in spa (parental1, species with
+      ## low hybrid index)
+      
       E.A<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
       if (is.null(combos.touse)==FALSE){
         for (i in 1:n.loci){
-          E.A[i,]<-combos.touse$spb.c1[i] + (combos.touse$spa.c1[i] - combos.touse$spb.c1[i]) * hi.index
+          ## prior to 16 Oct 09
+          ## E.A[i,]<-combos.touse$spb.c1[i] + (combos.touse$spa.c1[i] - combos.touse$spb.c1[i]) * hi.index
+          ## now
+          E.A[i,]<-combos.touse$spa.c2[i] + (combos.touse$spb.c2[i] - combos.touse$spa.c2[i]) * hi.index
         }
       }			
       else if (is.null(combos.touse)==TRUE){
+        ## tests for combos.touse, if it is still NULL fixed
+        ## differences are assumed, with spb (high hybrid index)
+        ## having a frequency of 0 and spa (low hybrid index) having a
+        ## frequency of 1
         for (i in 1:n.loci){
           E.A[i,]<-1-hi.index
         }
@@ -224,14 +238,14 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       for (i in 1:n.loci){
         if (loci.data[i,2]=="D" | loci.data[i,2]=="d"){
           ## determines if presence allele is present at higher
-          ## freq. in population1, if so E.A is presence allele
+          ## freq. in parental1 (spa), if so E.A is presence allele
           if ((alleles[i,1]=="1" & combos.touse[i,3]=="2") |
               (alleles[i,1]=="0" & combos.touse[i,3]=="1")){
             E.AA[i,]<-E.A[i,]^2 + 2*E.A[i,]*(1-E.A[i,])
             E.aa[i,]<-(1-E.A[i,])^2
           }
           ## determines if absence allele is present at higher
-          ## freq. in population1
+          ## freq. in parental1 (spa)
           else if ((alleles[i,1]=="1" & combos.touse[i,3]=="1") |
                    (alleles[i,1]=="0" & combos.touse[i,3]=="2")){
             E.AA[i,]<-E.A[i,]^2
