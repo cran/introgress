@@ -1,4 +1,4 @@
-`calc.intersp.het` <-
+calc.intersp.het <-
 function(introgress.data=NULL){
   if (is.null(introgress.data)==TRUE)
     stop("error, input data were not provided")

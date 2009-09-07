@@ -1,11 +1,14 @@
-`clines.plot` <-
+clines.plot <-
 function(cline.data=NULL, marker.order=NULL, rplots=3, cplots=3,
-                      pdf=TRUE, out.file="clines.pdf",colors=c("#005A32","#41AB5D")){
+                      pdf=TRUE, out.file="clines.pdf",colors=c("#005A32","#41AB5D"),
+                      quantiles=FALSE,lb.cd=rep(0.025,3),ub.cd=rep(0.975,3),
+                      lb.dh=rep(0.025,2),ub.dh=rep(0.975,2),cd=c("AA","Aa","aa"),dh=c("A","a")){
   if (is.null(cline.data)==TRUE)
     stop("error, input file was not provided")
   if (is.list(cline.data)==FALSE)
     stop("error, cline.data input file not in list format")
   if (length(colors)!=2) stop ("colors must be a vector of length two.")
+  if (quantiles==TRUE & is.null(cline.data$Quantiles)==TRUE) stop ("error, quantile data not found.")
   ##set up output file
   if (pdf==TRUE) pdf(file=paste(out.file))
   par(mfrow=c(rplots,cplots))
@@ -29,10 +32,40 @@ function(cline.data=NULL, marker.order=NULL, rplots=3, cplots=3,
     }
     marker.order<-tmp
   }
-
+  ## get quantile data for plotting if quantiles=TRUE
+  if(quantiles==TRUE){
+    gen.quantiles<-character(n.loci)
+    for (i in marker.order){
+      if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+        temp<-character(3)
+        for (j in 1:length(temp)){
+          if (cline.data$Quantiles[i,j] > ub.cd[j]) temp[j]<-"+"
+          else if (cline.data$Quantiles[i,j] < lb.cd[j]) temp[j]<-"-"
+          else temp[j]<-" "
+        }
+      }
+      else {
+        temp<-character(2)
+        for (j in 1:length(temp)){
+          if (cline.data$Quantiles[i,j] > ub.dh[j]) temp[j]<-"+"
+          else if (cline.data$Quantiles[i,j] < lb.dh[j]) temp[j]<-"-"
+          else temp[j]<-" "
+        }
+      }
+      if (length(temp)==3){
+        gen.quantiles[i]<-paste(cd[1],temp[1],"  ",cd[2],temp[2],"  ",cd[3],temp[3],sep="")
+      }
+      else gen.quantiles[i]<-paste(dh[1],temp[1],"  ",dh[2],temp[2],sep="")
+    }
+  }
+  
   ## loop through loci in marker.order making plots
   for(i in marker.order){
     plot(0:1,0:1,type="n",xlab="Hybrid index",ylab="Pr(genotype)",axes=FALSE)
+    ## add + and - for quantiles if quantiles==TRUE
+    if(quantiles==TRUE){
+      title(main=gen.quantiles[i],adj=0,cex.main=0.85)
+    }
     ## determine if locus is dominant, haploid, or codominant
     if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
       if (is.null(cline.data[[5]])==FALSE){

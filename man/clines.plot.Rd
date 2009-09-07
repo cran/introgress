@@ -8,7 +8,9 @@ output from the function \code{genomic.clines}.
 }
 \usage{
 clines.plot(cline.data=NULL,marker.order=NULL,rplots=3,cplots=3,pdf=TRUE,
-            out.file="clines.pdf",colors=c("#005A32","#41AB5D"))
+            out.file="clines.pdf",colors=c("#005A32","#41AB5D"),
+            quantiles=FALSE,lb.cd=rep(0.025,3),ub.cd=rep(0.975,3),
+            lb.dh=rep(0.025,2),ub.dh=rep(0.975,2),cd=c("AA","Aa","aa"),dh=c("A","a"))
 }
 \arguments{
   
@@ -33,6 +35,32 @@ clines.plot(cline.data=NULL,marker.order=NULL,rplots=3,cplots=3,pdf=TRUE,
     output if \code{pdf=TRUE}.}
 
   \item{colors}{a vector of two colors to be used for cline plots.}
+
+  \item{quantiles}{logical specifying whether to include genotype
+specific quantile information on the plots.}
+
+  \item{lb.cd}{numeric vector of three proportions specifying the lower
+  bounds for co-dominant markers that is used to determine whether each
+  genotype is under-represented.}
+
+  \item{ub.cd}{numeric vector of three proportions specifying the upper
+  bounds for co-dominant markers that is used to determine whether each
+  genotype is over-represented.}
+
+  \item{lb.dh}{numeric vector of two proportions specifying the lower
+  bounds for dominant and haploid markers that is used to determine
+  whether each genotype is under-reprsented.}
+
+  \item{ub.dh}{numeric vector of two proportions specifying the upper
+  bounds for dominant and haploid markers that is used to determine
+  whether each genotype is over-reprsented.} 
+
+  \item{cd}{vector with three characters used for labeling genotypes of
+  co-dominant markers in cline plots.}
+
+  \item{dh}{vector with two characters used for labeling genotypes of
+  dominant and haploid markers in cline plots.}
+
 }  
 
 \details{
@@ -51,9 +79,15 @@ individuals that are homozygous for alleles from population 1
 (co-dominant) or population 1 alleles (dominant or haploid) on the top
 line, interspecific heterozygotes (co-dominant only) in the middle, and
 homozygotes for alleles from population 2 (co-dominant) or population 2
-alleles (dominant or haploid) on the bottom line.  These number of
-individiuals with each genotype is printed on the right vertical
-axis. The locus name and \emph{P}-value are printed in each plot.
+alleles (dominant or haploid) on the bottom line.  The number of
+individuals with each genotype is printed on the right vertical
+axis. The locus name and \emph{P}-value are printed in each plot. If
+\code{quantiles = TRUE} and genotype-specific quantiles were computed
+with the \code{genomic.clines} function by setting \code{classification
+= TRUE}, a title is given for each individual plot that includes whether
+each genotype (as labeled by \code{cd} or \code{dh}) was over- (+) or
+under-represented (-) compared to neutral expectation using
+\code{lb.cd}, \code{ub.cd},\code{lb.dh}, \code{ub.dh} as thresholds. 
   
 See Gompert and Buerkle (2009a, 2009b) for additional details and examples.
 }

@@ -1,4 +1,4 @@
-`fixup.combos.touse` <-
+fixup.combos.touse <-
 function(working, myset, nallele){
   for(i in 1:length(myset)){
     if(working$spb.c1[i] < working$spa.c1[i]){

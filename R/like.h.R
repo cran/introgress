@@ -1,4 +1,4 @@
-`like.h` <-
+like.h <-
 function(geno, locustype, r, s, alleles, h){
   n.loci<-length(geno)
   result<-0

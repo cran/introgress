@@ -50,9 +50,11 @@ prepare.data(admix.gen=NULL, loci.data=NULL,
 data object with genotypes for each individual at each locus in the
 format `A/D' or `110/114' for co-dominant data, `A' or `hap1b' for
 haploid data, and `0' or `1' for dominant data.  In other words, for
-codominant and haploid data alleles can be encoded by any simple
+co-dominant and haploid data alleles can be encoded by any simple
 character string.  Each row should contain data for a locus and columns
-should correspond to individuals.
+should correspond to individuals. Missing data should be entered as
+`NA/NA' or `NA' for co-dominant and haploid / dominant data,
+respectively.
 
 Alternatively, in \code{admix.gen} genotypic data for an
 individual can be split between two rows (\code{sep.rows = TRUE}) or two
@@ -86,7 +88,8 @@ group (e.g. \emph{3.70}, for a marker at 70 cM on linkage group 3). This
 last column could be used to generate a different order in which to
 utilize marker data from \code{admix.gen} in other functions in the package
 (specified in the \code{marker.order} argument to \code{mk.image} and
-\code{clines.plot}).
+\code{clines.plot}).  Each column in \code{loci.data} should have a
+heading (the second column should be named "type").
 
 If the parental populations exhibit fixed differences for all markers
 scored (i.e. \code{fixed = TRUE}) then \code{parental1} and

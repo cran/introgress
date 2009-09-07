@@ -1,4 +1,4 @@
-`fit.c.clines` <-
+fit.c.clines <-
 function(reg.out=NULL, hi.index=NULL, sam=NULL, n.ind=NULL){
   if (length(coef(reg.out))>2){
     AA.slope<-coef(reg.out)[2,2]

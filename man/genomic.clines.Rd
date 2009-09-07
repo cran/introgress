@@ -10,7 +10,7 @@ testing is included, but optional.
 \usage{
 genomic.clines(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
                sig.test=FALSE, method="permutation", n.reps=1000,
-               het.cor=TRUE, loci.touse=NULL, ind.touse=NULL)
+               classification=FALSE,het.cor=TRUE, loci.touse=NULL, ind.touse=NULL)
 }
 \arguments{
 \item{introgress.data}{a list produced by
@@ -28,6 +28,9 @@ genomic.clines(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
   or "parametric".}
 
 \item{n.reps}{numeric value specifying number of neutral simulations.}
+
+\item{classification}{a logical specifying whether to calculate genotype
+  specific quantiles (ignored if sig.test=FALSE).}
 
 \item{het.cor}{a logical specifying whether to correct for deviations
   from expected heterozygosity when conducting neutral simulations using
@@ -68,14 +71,17 @@ This function (\code{genomic.clines}) estimates genomic clines in
 genotype frequency for admixed populations using the genomic clines
 method described by Gompert and Buerkle (2009a). If \code{sig.test =
 FALSE}, genomic clines are estimated for the admixed population, but no
-signficance testing is done. If \code{sig.test = TRUE}, the genomic
+significance testing is done. If \code{sig.test = TRUE}, the genomic
 cline for each locus is evaluated for deviations from neutral
 expectations. Either the permutation method (\code{method =
 "permutation"}) or the parametric method (\code{method = "parametric"})
 described by Gompert and Buerkle (2009a) can be used to generate the
 neutral distribution for significance testing. The permutation method
 cannot be used if both co-dominant and dominant (or haploid) data are
-included in the analysis.
+included in the analysis. If \code{classification = TRUE} this function
+also returns the proportion of neutral simulations/permutations yielding
+a model with a higher total probability of a given genotype for a given
+marker than the model from the observed data
 
 The function will issue a warning if an invariant locus is included (all
 individuals have the same genotype).  In this case the probability of
@@ -123,6 +129,11 @@ A list with the following components:
 \item{hybrid.index}{the user supplied \code{hi.index}.}
 
 \item{Loci.data}{the user supplied \code{loci.data}.}
+
+\item{Quantiles}{a matrix with the proportion of neutral
+  simulations/permutations yielding a model with a higher total probability
+  of a given genotype (column) than the model from the observed data;
+  proportions are provided for each locus (row).}
 
 }
 
@@ -203,7 +214,7 @@ hi.index2<-est.h(introgress.data=introgress.data2,
 clines.out2<-genomic.clines(introgress.data=introgress.data2,
                             hi.index=hi.index2, loci.data=LociDataSim1,
                             sig.test=TRUE, method="permutation",
-                            n.reps=100)
+                            classification=TRUE,n.reps=100)
 
 write.table(clines.out2$Summary.data, file="clines.txt",
             quote=FALSE, sep=",")

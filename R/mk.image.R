@@ -1,4 +1,4 @@
-`mk.image` <-
+mk.image <-
 function(introgress.data=NULL, loci.data=NULL, marker.order=NULL, hi.index=NULL,
                    ind.touse=NULL, loci.touse=NULL, ylab.image="Individuals",
                    main.image="", xlab.h="population 2 ancestry", col.image=NULL,

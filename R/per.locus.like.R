@@ -1,4 +1,4 @@
-`per.locus.like` <-
+per.locus.like <-
 function(a1, a2, locustype, r1, r2, s1, s2, h){
   p <- h * r1 + (1 - h) * s1
   q <- h * r2 + (1 - h) * s2

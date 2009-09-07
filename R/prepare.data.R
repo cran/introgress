@@ -1,4 +1,4 @@
-`prepare.data` <-
+prepare.data <-
 function(admix.gen=NULL,loci.data=NULL,
                        parental1=NULL, parental2=NULL, pop.id=TRUE,
                        ind.id=TRUE,fixed=FALSE, sep.rows=FALSE,

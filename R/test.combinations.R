@@ -1,4 +1,4 @@
-`test.combinations` <-
+test.combinations <-
 function(SpA, SpB){
   max.alleles<-length(SpA)
   SpA<-SpA[!is.na(SpA)]

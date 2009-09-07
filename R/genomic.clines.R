@@ -1,6 +1,6 @@
-`genomic.clines` <-
+genomic.clines <-
 function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
-                         sig.test=FALSE, method="permutation", n.reps=1000,
+                         sig.test=FALSE, method="permutation", n.reps=1000, classification=FALSE,
                          het.cor=TRUE, loci.touse=NULL, ind.touse=NULL){
   if (is.null(introgress.data)==TRUE | is.null(hi.index)==TRUE |
       is.null(loci.data)==TRUE) stop("error, missing input file(s)")
@@ -64,6 +64,7 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     AA.real.fitted.array<-array(dim=c(n.loci,n.ind))  
     Aa.real.fitted.array<-array(dim=c(n.loci,n.ind))
     aa.real.fitted.array<-array(dim=c(n.loci,n.ind))
+    
     ## Information on major storage variables: 
     ## AA.real.fitted.array, Aa.real.fitted.array, and aa.real.fitted.array are two dimensional arrays (loci, individuals)
     ## that store the fitted regression values for each individual at each locus based on the observed data. Note, AA corresponds to the 2 genotype.
@@ -82,7 +83,7 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
         if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
           AA.real.fitted.array[i,]<-clines.out[1,]
           Aa.real.fitted.array[i,]<-clines.out[2,]
-          aa.real.fitted.array[i,]<-clines.out[3,]
+          aa.real.fitted.array[i,]<-clines.out[3,] 
         }
         else{
           AA.real.fitted.array[i,]<-clines.out[1,]
@@ -156,7 +157,11 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     AA.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     Aa.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     aa.neutral.lb<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
-
+    ## save genotype probabilities
+    AA.realProbQ<-numeric(n.loci)
+    Aa.realProbQ<-numeric(n.loci)
+    aa.realProbQ<-numeric(n.loci)
+    
     ## permutation neutral simulations
     if (method=="permutation"){
       ## simulation of large population under neutrality
@@ -313,6 +318,7 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             AA.fitted.all[k,]<-clines.out[1,]
             Aa.fitted.all[k,]<-clines.out[2,]
             aa.fitted.all[k,]<-clines.out[3,]
+
           }
           else{
             AA.fitted.all[k,]<-clines.out[1,]
@@ -365,6 +371,12 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ln.likelihood.model1<-numeric(n.reps)
       ln.likelihood.model0<-numeric(n.reps)
       ln.likelihood.ratio10<-numeric(n.reps)
+
+      ## set up data objects to save genotype specific probabilities
+      AA.prob<-numeric(n.reps)
+      Aa.prob<-numeric(n.reps)
+      aa.prob<-numeric(n.reps)
+      
       ## perform regressions			
       for (k in 1:n.reps){
         local.cnt<-sam.gen[i,,k]
@@ -375,6 +387,12 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             AA.fitted.array[i,,k]<-clines.out[1,]
             Aa.fitted.array[i,,k]<-clines.out[2,]
             aa.fitted.array[i,,k]<-clines.out[3,]
+            ## save genotype probabilities
+            if(classification==TRUE){
+              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
+              Aa.prob[k]<-sum(Aa.fitted.array[i,,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+            }
           }
           else{
             AA.fitted.array[i,,k]<-clines.out[1,]
@@ -390,6 +408,11 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             Hx<-exp(AA.int.neutral+AA.slope.neutral*hi.index)
             AA.fitted.array[i,,k]<-exp(AA.int.neutral+AA.slope.neutral*hi.index)/(1+Hx)
             aa.fitted.array[i,,k]<-1-AA.fitted.array[i,,k]
+            ## save genotype probabilities
+            if(classification==TRUE){
+              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+            }
           }
           ## for co-dominant data
           ## this now uses the fit.c.clines function
@@ -398,6 +421,12 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             AA.fitted.array[i,,k]<-clines.out[1,]
             Aa.fitted.array[i,,k]<-clines.out[2,]
             aa.fitted.array[i,,k]<-clines.out[3,]
+            ## save genotype probabilities
+            if(classification==TRUE){
+              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
+              Aa.prob[k]<-sum(Aa.fitted.array[i,,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+            }
           }
         }
         ## calculates probability of models
@@ -479,10 +508,19 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           AA.real.fitted.array[i,]<-clines.out[1,]
           Aa.real.fitted.array[i,]<-clines.out[2,]
           aa.real.fitted.array[i,]<-clines.out[3,]
+          if(classification==TRUE){
+            AA.realProb<-sum(AA.real.fitted.array[i,],na.rm=TRUE)
+            Aa.realProb<-sum(Aa.real.fitted.array[i,],na.rm=TRUE)
+            aa.realProb<-sum(aa.real.fitted.array[i,],na.rm=TRUE)
+          }
         }
         else{
           AA.real.fitted.array[i,]<-clines.out[1,]
           aa.real.fitted.array[i,]<-clines.out[2,]
+          if(classification==TRUE){
+            AA.realProb<-sum(AA.real.fitted.array[i,],na.rm=TRUE)
+            aa.realProb<-sum(aa.real.fitted.array[i,],na.rm=TRUE) 
+          }
         }
       }
       else{
@@ -496,6 +534,11 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           Hx<-exp(AA.int[i]+AA.slope[i]*hi.index)
           AA.real.fitted.array[i,]<-exp(AA.int[i]+AA.slope[i]*hi.index)/(1+Hx)
           aa.real.fitted.array[i,]<-1-AA.real.fitted.array[i,]
+          ## save genotype probabilities
+          if(classification==TRUE){
+            AA.realProb<-sum(AA.real.fitted.array[i,],na.rm=TRUE)
+            aa.realProb<-sum(aa.real.fitted.array[i,],na.rm=TRUE)
+          }
         }	
         ## for co-dominant data
         else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
@@ -503,6 +546,12 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           AA.real.fitted.array[i,]<-clines.out[1,]
           Aa.real.fitted.array[i,]<-clines.out[2,]
           aa.real.fitted.array[i,]<-clines.out[3,]
+          ## save genotype probabilities
+          if(classification==TRUE){
+            AA.realProb<-sum(AA.real.fitted.array[i,],na.rm=TRUE)
+            Aa.realProb<-sum(Aa.real.fitted.array[i,],na.rm=TRUE)
+            aa.realProb<-sum(aa.real.fitted.array[i,],na.rm=TRUE)
+          }
         }
       }
       ## calculate probabilities
@@ -547,38 +596,49 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ## calculate and save p.value and ln.lik ratio	
       p.value[i]<-(sum(ln.likelihood.ratio10>=ln.likelihood.ratio10.real))/n.reps
       lnlik.ratios[i]<-ln.likelihood.ratio10.real
+      ## calculate and save genotype specific quantiles
+      if(classification==TRUE){
+        AA.realProbQ[i]<-sum(AA.prob < AA.realProb, na.rm=TRUE)/n.reps
+        if (loci.data[i,2]=="C" | loci.data[i,2]=="c")
+          Aa.realProbQ[i]<-sum(Aa.prob < Aa.realProb, na.rm=TRUE)/n.reps
+        aa.realProbQ[i]<-sum(aa.prob < aa.realProb, na.rm=TRUE)/n.reps
+      }
       ##the bracket below closes the locus loop
     }
-    
-    ## make list for output: clines.out is a list, the first element
-    ## gives the locus names, the next three elements are the fitted
-    ## values for AA, Aa, and aa; the next three elements are the
-    ## upper and lower bounds (2.5 and 97.5) for the simulated/neutral
-    ## fitted values for AA, Aa, and aa--these are NULL if
-    ## sig.test=FALSE
-    AA.bounds<-list(AA.neutral.ub,AA.neutral.lb)
-    Aa.bounds<-list(Aa.neutral.ub,Aa.neutral.lb)
-    aa.bounds<-list(aa.neutral.ub,aa.neutral.lb)
-    
-    ## name columns and rows and build list object
-    rownames(AA.real.fitted.array)<-loci.data[,1]
-    rownames(Aa.real.fitted.array)<-loci.data[,1]
-    rownames(aa.real.fitted.array)<-loci.data[,1]
-    if (is.null(individual.data)==FALSE){
-      colnames(AA.real.fitted.array)<-individual.data[,2]
-      colnames(Aa.real.fitted.array)<-individual.data[,2]
-      colnames(aa.real.fitted.array)<-individual.data[,2]
-    }
-    summary.data<-cbind(loci.data[,1],loci.data[,2],lnlik.ratios,p.value)
-    colnames(summary.data)<-c("locus","type","lnL ratio","P-value")
-    clines.out<-list(summary.data, AA.real.fitted.array, Aa.real.fitted.array,
-                     aa.real.fitted.array,AA.bounds,Aa.bounds,aa.bounds,count.matrix,
-                     hi.index,loci.data)
-    names(clines.out)<-c("Summary.data","Fitted.AA","Fitted.Aa","Fitted.aa",
-                         "Neutral.AA","Neutral.Aa","Neutral.aa",
-                         "Count.matrix","hybrid.index","Loci.data")
-    cat ("genomic clines analysis complete! \n")
-    return(clines.out)
   }
+  ## make list for output: clines.out is a list, the first element
+  ## gives the locus names, the next three elements are the fitted
+  ## values for AA, Aa, and aa; the next three elements are the
+  ## upper and lower bounds (2.5 and 97.5) for the simulated/neutral
+  ## fitted values for AA, Aa, and aa--these are NULL if
+  ## sig.test=FALSE
+  AA.bounds<-list(AA.neutral.ub,AA.neutral.lb)
+  Aa.bounds<-list(Aa.neutral.ub,Aa.neutral.lb)
+  aa.bounds<-list(aa.neutral.ub,aa.neutral.lb)
+  
+  ## name columns and rows and build list object
+  rownames(AA.real.fitted.array)<-loci.data[,1]
+  rownames(Aa.real.fitted.array)<-loci.data[,1]
+  rownames(aa.real.fitted.array)<-loci.data[,1]
+  if (is.null(individual.data)==FALSE){
+    colnames(AA.real.fitted.array)<-individual.data[,2]
+    colnames(Aa.real.fitted.array)<-individual.data[,2]
+    colnames(aa.real.fitted.array)<-individual.data[,2]
+  }
+  summary.data<-cbind(loci.data[,1],loci.data[,2],lnlik.ratios,p.value)
+  if(classification==TRUE){
+    quantiles<-cbind(AA.realProbQ,Aa.realProbQ,aa.realProbQ)
+    rownames(quantiles)<-loci.data[,1]
+  }
+  else quantiles<-NULL
+  colnames(summary.data)<-c("locus","type","lnL ratio","P-value")
+  clines.out<-list(summary.data, AA.real.fitted.array, Aa.real.fitted.array,
+                   aa.real.fitted.array,AA.bounds,Aa.bounds,aa.bounds,count.matrix,
+                   hi.index,loci.data,quantiles)
+  names(clines.out)<-c("Summary.data","Fitted.AA","Fitted.Aa","Fitted.aa",
+                       "Neutral.AA","Neutral.Aa","Neutral.aa",
+                       "Count.matrix","hybrid.index","Loci.data","Quantiles")
+  cat ("genomic clines analysis complete! \n")
+  return(clines.out)
 }
 

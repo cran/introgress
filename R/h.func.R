@@ -1,4 +1,4 @@
-`h.func` <-
+h.func <-
 function(geno, locustype, r, s, alleles){
   ## this is the top-level function for calculate h for a single individual
   ## geno: multilocus genotype

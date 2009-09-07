@@ -1,4 +1,4 @@
-`test.genotypes` <-
+test.genotypes <-
 function(admix.gen=NULL,loci.data=NULL,parental1=NULL,
                          parental2=NULL){
   ##the genetics library is needed for this function

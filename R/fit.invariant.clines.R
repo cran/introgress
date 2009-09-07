@@ -1,4 +1,4 @@
-`fit.invariant.clines` <-
+fit.invariant.clines <-
 function(sam=NULL,n.ind=NULL,locustype=NULL){
   if (locustype=="C" | locustype=="c"){
     if(sum(sam==2,na.rm=TRUE)>=1){

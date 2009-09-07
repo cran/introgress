@@ -1,4 +1,4 @@
-`est.h` <-
+est.h <-
 function(introgress.data=NULL, loci.data=NULL, ind.touse=NULL,
                 fixed=FALSE, p1.allele=NULL, p2.allele=NULL){
   ## This makes sure that the genotype matrix, locus data, and parental

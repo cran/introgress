@@ -6,7 +6,8 @@ This function contrasts patterns of introgression between two hybrid zones.
 
 }
 \usage{
-compare.clines(cline.data1=NULL,cline.data2=NULL)
+compare.clines(cline.data1=NULL,cline.data2=NULL,sig.test=FALSE,
+               n.reps=1000)
 }
 \arguments{
   
@@ -15,6 +16,10 @@ compare.clines(cline.data1=NULL,cline.data2=NULL)
   
   \item{cline.data2}{a list that is the product of the
     \code{genomic.clines} function.}
+  \item{sig.test}{a logical specifying whether to perform significance
+    testing.}
+  \item{n.reps}{numeric value specifying the number of permutations to
+    conduct for signficance testing.}
   
 }  
 
@@ -35,14 +40,19 @@ predicting allele counts using the regression model from
 in the original model. The log likelihood ratios returned by this
 function can be used to determine the degree of congruence for marker
 specific patterns of introgression between the analyzed hybrid
-zones. This function does not include estimation of a null distribution
-of log likelihood ratios for significance testing. 
+zones. This function includes a permutation procedure for testing
+whether log likelihood ratios are significantly greater than expected by
+chance, which is invoked by setting \code{sig.test = TRUE}. This option
+should only be employed when both hybrid zones contain many individuals
+with low and high hybrid index estimates to minimized the problem
+described above.
   
 See Gompert and Buerkle (2009a, 2009b) for additional details and examples.
 }
 
 \value{
-A matrix with log likelihood ratios for each marker (row).  
+A matrix with log likelihood ratios for each marker and P-values from
+significance testing if \code{sisg.test = TRUE}.  
 }
   
 \references{
@@ -50,7 +60,7 @@ Gompert Z. and Buerkle C. A. (2009) A powerful regression-based
 method for admixture mapping of isolation across the genome of
 hybrids. \emph{Molecular Ecology}, \bold{18}, 1207-1224.
 
-  Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
+Gompert Z. and Buerkle C. A. (2009) \emph{introgress}: a software
 package for mapping components of isolation in hybrids. \emph{Molecular
 Ecology Resources}, \emph{in preparation}.
 
@@ -98,8 +108,10 @@ clines.out1<-genomic.clines(introgress.data=introgress.data,
 clines.out2<-genomic.clines(introgress.data=introgress.data,
                             hi.index=hi.index,loci.data=LociDataSim1,
                             sig.test=FALSE, ind.touse=sam2)
-## compare clines between data sets
-comp.out<-compare.clines(clines.out1,clines.out2)
+
+## compare clines between data sets, with significance testing
+comp.out<-compare.clines(clines.out1,clines.out2,sig.test=TRUE,
+                         n.reps=1000)
 
 write.table(comp.out, file="compareClines.txt",
             quote=FALSE, sep=",")
