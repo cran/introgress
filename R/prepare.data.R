@@ -114,7 +114,7 @@ function(admix.gen=NULL,loci.data=NULL,
   for(i in 1:n.loci){
     for(j in 1:n.ind){
       if(is.na(admix.gen[i,j])==FALSE){
-        if(admix.gen[i,j]=="NA") admix.gen[i,j]<-NA
+        if(admix.gen[i,j]=="NA"| admix.gen[i,j]=="NA/NA") admix.gen[i,j]<-NA
       }
     }
   }
@@ -123,14 +123,14 @@ function(admix.gen=NULL,loci.data=NULL,
     for(i in 1:n.loci){
       for(j in 1:dim(parental1)[2]){
         if(is.na(parental1[i,j])==FALSE){
-          if(parental1[i,j]=="NA") parental1[i,j]<-NA
+          if(parental1[i,j]=="NA" | parental1[i,j]=="NA/NA") parental1[i,j]<-NA
         }
       }
     }
     for(i in 1:n.loci){
       for(j in 1:dim(parental2)[2]){
         if(is.na(parental2[i,j])==FALSE){
-          if(parental2[i,j]=="NA") parental2[i,j]<-NA
+          if(parental2[i,j]=="NA"| parental2[i,j]=="NA/NA") parental2[i,j]<-NA
         }
       }
     }    

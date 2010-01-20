@@ -107,7 +107,7 @@ function(cline.data1=NULL, cline.data2=NULL, sig.test=FALSE,
       probM1D2<-rep(NA,n.ind)
       probM2D2<-rep(NA,n.ind)
       ## for co-dominant markers    
-      if (cline.data2$Loci.data[i,2]=="C" | cline.data2$Loci.data[i,2]=="C"){
+      if (cline.data2$Loci.data[i,2]=="C" | cline.data2$Loci.data[i,2]=="c"){
         for (z in 1:n.ind){
           if (is.na(cline.data2$Count.matrix[i,z])==FALSE){
             if (cline.data2$Count.matrix[i,z]==2){
@@ -256,7 +256,7 @@ function(cline.data1=NULL, cline.data2=NULL, sig.test=FALSE,
       probM1D2<-rep(NA,n.ind)
       probM2D2<-rep(NA,n.ind)
       ## for co-dominant markers    
-      if (cline.data2$Loci.data[i,2]=="C" | cline.data2$Loci.data[i,2]=="C"){
+      if (cline.data2$Loci.data[i,2]=="C" | cline.data2$Loci.data[i,2]=="c"){
         for (z in 1:n.ind){
           if (is.na(cline.data2$Count.matrix[i,z])==FALSE){
             if (cline.data2$Count.matrix[i,z]==2){
