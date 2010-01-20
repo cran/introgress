@@ -136,8 +136,7 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
   else if (sig.test==TRUE){
     ## verify that a proper method was specified
     if (method!="permutation" & method!="parametric") stop("invalid method specified")
-    ## notify user of progress
-    cat ("generating neutral expectations \n")
+    cat ("begining analysis. \n")
     ## set up data objects for results
     p.value<-numeric(n.loci)
     lnlik.ratios<-numeric(n.loci)
@@ -146,9 +145,9 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     AA.int<-numeric(n.loci)
     Aa.int<-numeric(n.loci)
     
-    AA.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
-    Aa.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
-    aa.fitted.array<-array(rep(NA,n.loci*n.ind*n.reps),dim=c(n.loci,n.ind,n.reps))
+    AA.fitted.array<-array(rep(NA,n.ind*n.reps),dim=c(n.ind,n.reps))
+    Aa.fitted.array<-array(rep(NA,n.ind*n.reps),dim=c(n.ind,n.reps))
+    aa.fitted.array<-array(rep(NA,n.ind*n.reps),dim=c(n.ind,n.reps))
     
     AA.real.fitted.array<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
     Aa.real.fitted.array<-array(rep(NA,n.loci*n.ind),dim=c(n.loci,n.ind))
@@ -169,27 +168,26 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     ## permutation neutral simulations
     if (method=="permutation"){
       ## simulation of large population under neutrality
-      sam.neutral<-array(dim=c(n.loci,n.ind,n.reps))
+      sam.neutral<-array(dim=c(n.ind,n.reps))
       for (j in 1:n.ind){
         for(k in 1:n.reps){
-          sam.neutral[,j,k]<-sample(count.matrix[,j],length(count.matrix[,j]),replace=FALSE)
+          sam.neutral[j,k]<-sample(count.matrix[,j],1,replace=FALSE)
         }	
       }
       ## simulation of neutral replicate populations
-      sam.gen<-array(dim=c(n.loci,n.ind,n.reps))
+      sam.gen<-array(dim=c(n.ind,n.reps))
       for (j in 1:n.ind){
         for(k in 1:n.reps){
-          sam.gen[,j,k]<-sample(count.matrix[,j],length(count.matrix[,j]),replace=FALSE)
+          sam.gen[j,k]<-sample(count.matrix[,j],1,replace=FALSE)
         }	
       }			
     }	
     ## parametric neutral simulations
     if (method=="parametric"){
       ## set up data objects for results
-      sam.neutral<-array(dim=c(n.loci,n.ind,n.reps))
-      sam.gen<-array(dim=c(n.loci,n.ind,n.reps))
+      sam.neutral<-array(dim=c(n.ind,n.reps))
+      sam.gen<-array(dim=c(n.ind,n.reps))
       
-
       ## E.A is the prob of sampling an allele from allelic class 2,
       ## which is at higher frequency in spa (parental1, species with
       ## low hybrid index)
@@ -254,34 +252,10 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           else
             stop(paste("dominant marker data is not coded properly for marker:",
                        loci.data[i,1]))
-          ## simulation of large population under neutrality
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.neutral[i,j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
-            }	
-          }
-          ## simulation of neutral replicate populations
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.gen[i,j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
-            }	
-          }
         }	
-        if (loci.data[i,2]=="H" | loci.data[i,2]=="h"){
+        else if (loci.data[i,2]=="H" | loci.data[i,2]=="h"){
           E.AA[i,]<-E.A[i,]
           E.aa[i,]<-1-E.A[i,]
-          ## simulation of large population under neutrality
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.neutral[i,j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
-            }	
-          }
-          ## simulation of neutral replicate populations
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.gen[i,j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
-            }	
-          }
         }	
         else if	(loci.data[i,2]=="C" | loci.data[i,2]=="c"){
           ## calculate E.AA etc. and normalize
@@ -298,20 +272,6 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             if(E.Aa[i,j]<0) E.Aa[i,j]<-0
             else if(E.Aa[i,j]>1) E.Aa[i,j]<-1
           }	
-          ## simulation of large population under neutrality
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.neutral[i,j,k]<-sample(c(2,1,0),1,replace=TRUE,
-                                         prob=c(E.AA[i,j],E.Aa[i,j],E.aa[i,j]))
-            }	
-          }
-          ##simulation of neutral replicate populations
-          for (j in 1:n.ind){
-            for(k in 1:n.reps){
-              sam.gen[i,j,k]<-sample(c(2,1,0),1,replace=TRUE,
-                                     prob=c(E.AA[i,j],E.Aa[i,j],E.aa[i,j]))
-            }	
-          }
         }	
       }
     }	
@@ -319,15 +279,69 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
     ##begin cycling through loci			
     for (i in 1:n.loci){
       cat("estimating genomic cline for:",as.character(loci.data[i,1]),"\n")
+      ## locus specific neutral samples for parametric method
+      if (method=="parametric"){
+        ## clear sams
+        sam.neutral[,]<-NA
+        sam.gen[,]<-NA
+        if (loci.data[i,2]=="D" | loci.data[i,2]=="d"){
+          ## simulation of large population under neutrality
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.neutral[j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
+            }	
+          }
+          ## simulation of neutral replicate populations
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.gen[j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
+            }	
+          }         
+        }
+        else if (loci.data[i,2]=="H" | loci.data[i,2]=="h"){
+          ## simulation of large population under neutrality
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.neutral[j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
+            }	
+          }
+          ## simulation of neutral replicate populations
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.gen[j,k]<-sample(c(1,0),1,replace=TRUE,prob=c(E.AA[i,j],E.aa[i,j]))
+            }	
+          }
+        }
+        else if	(loci.data[i,2]=="C" | loci.data[i,2]=="c"){
+          ## simulation of large population under neutrality
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.neutral[j,k]<-sample(c(2,1,0),1,replace=TRUE,
+                                         prob=c(E.AA[i,j],E.Aa[i,j],E.aa[i,j]))
+            }	
+          }
+          ##simulation of neutral replicate populations
+          for (j in 1:n.ind){
+            for(k in 1:n.reps){
+              sam.gen[j,k]<-sample(c(2,1,0),1,replace=TRUE,
+                                     prob=c(E.AA[i,j],E.Aa[i,j],E.aa[i,j]))
+            }	
+          }
+        }
+      }
+      ## clear fitted.array
+      AA.fitted.array[,]<-NA
+      Aa.fitted.array[,]<-NA
+      aa.fitted.array[,]<-NA
       ## clines analysis for mean neutral expectations
       AA.fitted.all<-array(dim=c(n.reps,n.ind))
       Aa.fitted.all<-array(dim=c(n.reps,n.ind))
       aa.fitted.all<-array(dim=c(n.reps,n.ind))
       for (k in 1:n.reps){
-        local.cnt<-sam.neutral[i,,k]
+        local.cnt<-sam.neutral[,k]
         local.cnt<-local.cnt[!is.na(local.cnt)]
         if(length(unique(local.cnt))==1){
-          clines.out<-fit.invariant.clines(sam.neutral[i,,k],n.ind,loci.data[i,2])
+          clines.out<-fit.invariant.clines(sam.neutral[,k],n.ind,loci.data[i,2])
           if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
             AA.fitted.all[k,]<-clines.out[1,]
             Aa.fitted.all[k,]<-clines.out[2,]
@@ -340,7 +354,7 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           }
         }
         else {
-          reg.out<-multinom(sam.neutral[i,,k]~hi.index, trace=FALSE)
+          reg.out<-multinom(sam.neutral[,k]~hi.index, trace=FALSE)
           ## for dominant or haploid markers data
           if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" |
               loci.data[i,2]=="h"){
@@ -353,13 +367,13 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
           ## for co-dominant data
           ## this now uses the fit.c.clines function
           else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-            clines.out<-fit.c.clines(reg.out,hi.index,sam.neutral[i,,k],n.ind)
+            clines.out<-fit.c.clines(reg.out,hi.index,sam.neutral[,k],n.ind)
             AA.fitted.all[k,]<-clines.out[1,]
             Aa.fitted.all[k,]<-clines.out[2,]
             aa.fitted.all[k,]<-clines.out[3,]
           }
         }
-      }#temp
+      }
       ## sum results from each rep
       if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data [i,2]=="H" |
           loci.data [i,2]=="h"){
@@ -393,53 +407,53 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       
       ## perform regressions			
       for (k in 1:n.reps){
-        local.cnt<-sam.gen[i,,k]
+        local.cnt<-sam.gen[,k]
         local.cnt<-local.cnt[!is.na(local.cnt)]
         if(length(unique(local.cnt))==1){
-          clines.out<-fit.invariant.clines(sam.gen[i,,k],n.ind,loci.data[i,2])
+          clines.out<-fit.invariant.clines(sam.gen[,k],n.ind,loci.data[i,2])
           if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-            AA.fitted.array[i,,k]<-clines.out[1,]
-            Aa.fitted.array[i,,k]<-clines.out[2,]
-            aa.fitted.array[i,,k]<-clines.out[3,]
+            AA.fitted.array[,k]<-clines.out[1,]
+            Aa.fitted.array[,k]<-clines.out[2,]
+            aa.fitted.array[,k]<-clines.out[3,]
             ## save genotype probabilities
             if(classification==TRUE){
-              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
-              Aa.prob[k]<-sum(Aa.fitted.array[i,,k],na.rm=TRUE)
-              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+              AA.prob[k]<-sum(AA.fitted.array[,k],na.rm=TRUE)
+              Aa.prob[k]<-sum(Aa.fitted.array[,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[,k],na.rm=TRUE)
             }
           }
           else{
-            AA.fitted.array[i,,k]<-clines.out[1,]
-            aa.fitted.array[i,,k]<-clines.out[2,]
+            AA.fitted.array[,k]<-clines.out[1,]
+            aa.fitted.array[,k]<-clines.out[2,]
           }
         }
         else{
-          reg.out<-multinom(sam.gen[i,,k]~hi.index, trace=FALSE)
+          reg.out<-multinom(sam.gen[,k]~hi.index, trace=FALSE)
           ## for dominant or haploid marker data
           if (loci.data[i,2]=="D" | loci.data[i,2]=="d" | loci.data[i,2]=="H" | loci.data[i,2]=="h"){
             AA.slope.neutral<-coef(reg.out)[2]
             AA.int.neutral<-coef(reg.out)[1]
             Hx<-exp(AA.int.neutral+AA.slope.neutral*hi.index)
-            AA.fitted.array[i,,k]<-exp(AA.int.neutral+AA.slope.neutral*hi.index)/(1+Hx)
-            aa.fitted.array[i,,k]<-1-AA.fitted.array[i,,k]
+            AA.fitted.array[,k]<-exp(AA.int.neutral+AA.slope.neutral*hi.index)/(1+Hx)
+            aa.fitted.array[,k]<-1-AA.fitted.array[,k]
             ## save genotype probabilities
             if(classification==TRUE){
-              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
-              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+              AA.prob[k]<-sum(AA.fitted.array[,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[,k],na.rm=TRUE)
             }
           }
           ## for co-dominant data
           ## this now uses the fit.c.clines function
           else if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
-            clines.out<-fit.c.clines(reg.out,hi.index,sam.gen[i,,k],n.ind)
-            AA.fitted.array[i,,k]<-clines.out[1,]
-            Aa.fitted.array[i,,k]<-clines.out[2,]
-            aa.fitted.array[i,,k]<-clines.out[3,]
+            clines.out<-fit.c.clines(reg.out,hi.index,sam.gen[,k],n.ind)
+            AA.fitted.array[,k]<-clines.out[1,]
+            Aa.fitted.array[,k]<-clines.out[2,]
+            aa.fitted.array[,k]<-clines.out[3,]
             ## save genotype probabilities
             if(classification==TRUE){
-              AA.prob[k]<-sum(AA.fitted.array[i,,k],na.rm=TRUE)
-              Aa.prob[k]<-sum(Aa.fitted.array[i,,k],na.rm=TRUE)
-              aa.prob[k]<-sum(aa.fitted.array[i,,k],na.rm=TRUE)
+              AA.prob[k]<-sum(AA.fitted.array[,k],na.rm=TRUE)
+              Aa.prob[k]<-sum(Aa.fitted.array[,k],na.rm=TRUE)
+              aa.prob[k]<-sum(aa.fitted.array[,k],na.rm=TRUE)
             }
           }
         }
@@ -449,17 +463,17 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
             loci.data[i,2]=="h"){
           for(z in 1:n.ind){
             if(is.na(count.matrix[i,z])==FALSE){
-              if(is.na(sam.gen[i,z,k])==FALSE){
-                if(sam.gen[i,z,k]==2) {
-                  prob.obs.model1[z]<-AA.fitted.array[i,z,k]
+              if(is.na(sam.gen[z,k])==FALSE){
+                if(sam.gen[z,k]==2) {
+                  prob.obs.model1[z]<-AA.fitted.array[z,k]
                   prob.obs.model0[z]<-AA.fitted.mean[z]
                 }	
-                else if(sam.gen[i,z,k]==0){ 
-                  prob.obs.model1[z]<-aa.fitted.array[i,z,k]
+                else if(sam.gen[z,k]==0){ 
+                  prob.obs.model1[z]<-aa.fitted.array[z,k]
                   prob.obs.model0[z]<-aa.fitted.mean[z]
                 }	
               }
-              else if(is.na(sam.gen[i,z,k])==TRUE){
+              else if(is.na(sam.gen[z,k])==TRUE){
                 prob.obs.model1[z]<-0.50
                 prob.obs.model0[z]<-0.50
               }	
@@ -470,21 +484,21 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
         if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
           for(z in 1:n.ind){
             if(is.na(count.matrix[i,z])==FALSE){
-              if(is.na(sam.gen[i,z,k])==FALSE){
-                if(sam.gen[i,z,k]==2) {
-                  prob.obs.model1[z]<-AA.fitted.array[i,z,k]
+              if(is.na(sam.gen[z,k])==FALSE){
+                if(sam.gen[z,k]==2) {
+                  prob.obs.model1[z]<-AA.fitted.array[z,k]
                   prob.obs.model0[z]<-AA.fitted.mean[z]
                 }	
-                else if(sam.gen[i,z,k]==1) {
-                  prob.obs.model1[z]<-Aa.fitted.array[i,z,k]
+                else if(sam.gen[z,k]==1) {
+                  prob.obs.model1[z]<-Aa.fitted.array[z,k]
                   prob.obs.model0[z]<-Aa.fitted.mean[z]
                 }	
-                else if(sam.gen[i,z,k]==0){ 
-                  prob.obs.model1[z]<-aa.fitted.array[i,z,k]
+                else if(sam.gen[z,k]==0){ 
+                  prob.obs.model1[z]<-aa.fitted.array[z,k]
                   prob.obs.model0[z]<-aa.fitted.mean[z]
                 }	
               }
-              else if(is.na(sam.gen[i,z,k])==TRUE){
+              else if(is.na(sam.gen[z,k])==TRUE){
                 prob.obs.model1[z]<-0.33
                 prob.obs.model0[z]<-0.33
               }	
@@ -498,12 +512,12 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ## save upper and lower bounds of 95%CI from neutral
       ## simulations, these are for making cline plots
       for (j in 1:n.ind){
-        AA.neutral.ub[i,j]<-sort(AA.fitted.array[i,j,])[n.reps*0.975]
-        Aa.neutral.ub[i,j]<-sort(Aa.fitted.array[i,j,])[n.reps*0.975]
-        aa.neutral.ub[i,j]<-sort(aa.fitted.array[i,j,])[n.reps*0.975]
-        AA.neutral.lb[i,j]<-sort(AA.fitted.array[i,j,])[n.reps*0.0275]
-        Aa.neutral.lb[i,j]<-sort(Aa.fitted.array[i,j,])[n.reps*0.0275]
-        aa.neutral.lb[i,j]<-sort(aa.fitted.array[i,j,])[n.reps*0.0275]
+        AA.neutral.ub[i,j]<-sort(AA.fitted.array[j,])[n.reps*0.975]
+        Aa.neutral.ub[i,j]<-sort(Aa.fitted.array[j,])[n.reps*0.975]
+        aa.neutral.ub[i,j]<-sort(aa.fitted.array[j,])[n.reps*0.975]
+        AA.neutral.lb[i,j]<-sort(AA.fitted.array[j,])[n.reps*0.0275]
+        Aa.neutral.lb[i,j]<-sort(Aa.fitted.array[j,])[n.reps*0.0275]
+        aa.neutral.lb[i,j]<-sort(aa.fitted.array[j,])[n.reps*0.0275]
       }
       ## assign rownames, this is necessary for indexing by locus names 
       ## when making cline plots
@@ -613,9 +627,10 @@ function(introgress.data=NULL, hi.index=NULL, loci.data=NULL,
       ## calculate and save genotype specific quantiles
       if(classification==TRUE){
         AA.realProbQ[i]<-sum(AA.prob < AA.realProb, na.rm=TRUE)/n.reps
-        if (loci.data[i,2]=="C" | loci.data[i,2]=="c")
+        if (loci.data[i,2]=="C" | loci.data[i,2]=="c"){
           Aa.realProbQ[i]<-sum(Aa.prob < Aa.realProb, na.rm=TRUE)/n.reps
-        aa.realProbQ[i]<-sum(aa.prob < aa.realProb, na.rm=TRUE)/n.reps
+          aa.realProbQ[i]<-sum(aa.prob < aa.realProb, na.rm=TRUE)/n.reps
+        }
       }
       ##the bracket below closes the locus loop
     }

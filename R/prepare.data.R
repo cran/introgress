@@ -110,6 +110,32 @@ function(admix.gen=NULL,loci.data=NULL,
   n.loci<-dim(admix.gen)[1]
   n.ind<-dim(admix.gen)[2]
 
+  ## make sure NA's are correct in admixed and parentals
+  for(i in 1:n.loci){
+    for(j in 1:n.ind){
+      if(is.na(admix.gen[i,j])==FALSE){
+        if(admix.gen[i,j]=="NA") admix.gen[i,j]<-NA
+      }
+    }
+  }
+
+  if (fixed==FALSE){
+    for(i in 1:n.loci){
+      for(j in 1:dim(parental1)[2]){
+        if(is.na(parental1[i,j])==FALSE){
+          if(parental1[i,j]=="NA") parental1[i,j]<-NA
+        }
+      }
+    }
+    for(i in 1:n.loci){
+      for(j in 1:dim(parental2)[2]){
+        if(is.na(parental2[i,j])==FALSE){
+          if(parental2[i,j]=="NA") parental2[i,j]<-NA
+        }
+      }
+    }    
+  }
+
   cat("Processing data for", n.ind, "individuals and", n.loci, "loci.", fill=TRUE)
 
   ## if the parental allele frequencies exhibit fixed differences
